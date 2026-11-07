@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import * as DocumentPicker from 'expo-document-picker';
 import {
   View,
   Text,
@@ -8,23 +9,25 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 
 const servers = [
-  { id: 'de', name: 'آلمان', city: 'فرانکفورت', flag: '🇩🇪', ping: '32 ms' },
-  { id: 'nl', name: 'هلند', city: 'آمستردام', flag: '🇳🇱', ping: '45 ms' },
-  { id: 'fi', name: 'فنلاند', city: 'هلسینکی', flag: '🇫🇮', ping: '58 ms' },
+  { id: 'de', name: 'آلمان', city: 'فرانکفورت', flag: '🇩🇪', ping: 'تنظیم نشده' },
+  { id: 'nl', name: 'هلند', city: 'آمستردام', flag: '🇳🇱', ping: 'تنظیم نشده' },
+  { id: 'fi', name: 'فنلاند', city: 'هلسینکی', flag: '🇫🇮', ping: 'تنظیم نشده' },
 ];
 
 export default function App() {
-  const [connected, setConnected] = useState(false);
+  const connected = false;
   const [selected, setSelected] = useState('de');
+  const [configName, setConfigName] = useState<string | null>(null);
 
   const server = servers.find(s => s.id === selected)!;
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" backgroundColor="#080B14" />
+      <StatusBar barStyle="light-content" />
 
       <ScrollView contentContainerStyle={styles.container}>
 
@@ -37,7 +40,7 @@ export default function App() {
           <View style={styles.badge}>
             <View style={[styles.dot, connected && styles.green]} />
             <Text style={styles.badgeText}>
-              {connected ? 'CONNECTED' : 'READY'}
+              {connected ? 'CONNECTED' : 'NOT CONFIGURED'}
             </Text>
           </View>
         </View>
@@ -55,19 +58,19 @@ export default function App() {
               styles.connectButton,
               connected && styles.connectedButton
             ]}
-            onPress={() => setConnected(!connected)}
+            onPress={() => Alert.alert('سرور تنظیم نشده', 'برای اتصال واقعی، ابتدا باید کانفیگ معتبر WireGuard وارد شود.')}
           >
             <Text style={styles.power}>⏻</Text>
             <Text style={styles.connectText}>
               {connected ? 'قطع اتصال' : 'اتصال'}
             </Text>
             <Text style={styles.connectSub}>
-              {connected ? 'SIMULATED SESSION' : 'TAP TO CONNECT'}
+              {connected ? 'CONNECTED' : 'SERVER NOT CONFIGURED'}
             </Text>
           </TouchableOpacity>
 
           <Text style={styles.status}>
-            {connected ? '● اتصال آزمایشی فعال است' : '○ هنوز متصل نشده‌اید'}
+            {connected ? '● متصل' : '○ سرور WireGuard تنظیم نشده است'}
           </Text>
         </View>
 
@@ -104,6 +107,47 @@ export default function App() {
           </TouchableOpacity>
         ))}
 
+        <View style={styles.configBox}>
+          <Text style={styles.configTitle}>WIREGUARD CONFIGURATION</Text>
+
+          <TouchableOpacity
+            style={styles.configButton}
+            activeOpacity={0.8}
+            onPress={async () => {
+              try {
+                const result = await DocumentPicker.getDocumentAsync({
+                  type: '*/*',
+                  copyToCacheDirectory: true,
+                });
+
+                if (!result.canceled && result.assets.length > 0) {
+                  const name = result.assets[0].name;
+
+                  if (!name.toLowerCase().endsWith('.conf')) {
+                    Alert.alert('فایل نامعتبر', 'لطفاً یک فایل با پسوند .conf انتخاب کن.');
+                    return;
+                  }
+
+                  setConfigName(name);
+                  Alert.alert('فایل انتخاب شد', 'نام فایل: ' + name);
+                }
+              } catch {
+                Alert.alert('خطا', 'انتخاب فایل انجام نشد.');
+              }
+            }}
+          >
+            <Text style={styles.configButtonText}>＋  وارد کردن کانفیگ WireGuard</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.configName}>
+            {configName ? 'فایل انتخاب‌شده: ' + configName : 'هنوز فایلی انتخاب نشده است'}
+          </Text>
+
+          <Text style={styles.configHint}>
+            انتخاب فایل به‌تنهایی اتصال VPN را فعال نمی‌کند.
+          </Text>
+        </View>
+
         <View style={styles.stats}>
           <View style={styles.statBox}>
             <Text style={styles.statIcon}>↓</Text>
@@ -126,7 +170,7 @@ export default function App() {
             {server.flag}  {server.name} - {server.city}
           </Text>
           <Text style={styles.infoDescription}>
-            انتخاب سرور در این نسخه صرفاً در رابط کاربری انجام می‌شود.
+            این سرور هنوز پیکربندی نشده است و اتصال واقعی WireGuard فعال نیست.
           </Text>
         </View>
 
@@ -361,6 +405,43 @@ const styles = StyleSheet.create({
     width: 1,
     height: 55,
     backgroundColor: '#30384B',
+  },
+  configBox: {
+    marginTop: 22,
+    padding: 17,
+    backgroundColor: '#171B2A',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#282D41',
+  },
+  configTitle: {
+    color: '#A78BFA',
+    fontSize: 11,
+    fontWeight: 'bold',
+    marginBottom: 13,
+  },
+  configButton: {
+    backgroundColor: '#302454',
+    borderRadius: 12,
+    padding: 15,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#A78BFA',
+  },
+  configButtonText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  configName: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    marginTop: 13,
+  },
+  configHint: {
+    color: '#818BA0',
+    fontSize: 10,
+    marginTop: 8,
   },
   info: {
     marginTop: 22,
