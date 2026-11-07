@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import * as DocumentPicker from 'expo-document-picker';
 import {
   View,
+  Image,
   Text,
   StyleSheet,
   StatusBar,
@@ -32,9 +33,16 @@ export default function App() {
       <ScrollView contentContainerStyle={styles.container}>
 
         <View style={styles.header}>
-          <View>
-            <Text style={styles.logo}>MORZEX<Text style={styles.logoAccent}> VPN</Text></Text>
-            <Text style={styles.subtitle}>SECURE CONNECTION</Text>
+          <View style={styles.brand}>
+            <Image
+              source={require('./assets/brand/morzex-icon.png')}
+              style={styles.brandIcon}
+              resizeMode="contain"
+            />
+            <View>
+              <Text style={styles.logo}>MORZEX<Text style={styles.logoAccent}> VPN</Text></Text>
+              <Text style={styles.subtitle}>SECURE CONNECTION</Text>
+            </View>
           </View>
 
           <View style={styles.badge}>
@@ -201,6 +209,15 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 38,
   },
+  brand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  brandIcon: {
+    width: 48,
+    height: 48,
+  },
   logo: {
     color: '#FFFFFF',
     fontSize: 25,
@@ -208,7 +225,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   logoAccent: {
-    color: '#9B7BFF',
+    color: '#D6AE45',
   },
   subtitle: {
     color: '#717B91',
