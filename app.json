@@ -11,12 +11,22 @@
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
-      ]
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/brand/morzex-icon.png",
+        "backgroundColor": "#040507"
+      }
     },
     "extra": {
       "eas": {
         "projectId": "38c08d3e-4ebc-4aaa-b08c-251e80925c18"
       }
+    },
+    "icon": "./assets/brand/morzex-icon.png",
+    "splash": {
+      "image": "./assets/brand/morzex-splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#040507"
     }
   }
 }
