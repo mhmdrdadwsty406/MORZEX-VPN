@@ -37,7 +37,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#040507"
         }
-      ]
+      ],
+      "./plugins/withMorzexDesugaring"
     ]
   }
 }
