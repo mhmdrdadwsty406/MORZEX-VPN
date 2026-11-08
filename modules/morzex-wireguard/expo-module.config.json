@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["MorzexWireguardModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.morzexwireguard.MorzexWireguardModule"]
+  }
+}
