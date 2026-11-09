@@ -62,11 +62,25 @@ jobs:
           p.write_text(s)
           PYTHON
 
+      - name: Verify WireGuard dependency resolution
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew :morzex-wireguard:dependencies --configuration releaseRuntimeClasspath --no-daemon
+
       - name: Build Release APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
+
+      - name: Inspect merged Android manifests
+        if: always()
+        run: |
+          echo "===== MANIFEST FILES ====="
+          find android/app/build/intermediates -type f -name AndroidManifest.xml -print
+          echo "===== VPN SERVICE REFERENCES ====="
+          grep -RniE 'GoBackend|VpnService|BIND_VPN_SERVICE|android.net.VpnService' android/app/build/intermediates/merged_manifests android/app/build/intermediates/packaged_manifests 2>/dev/null || true
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
