@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as SecureStore from 'expo-secure-store';
 import {
   View,
   Image,
@@ -18,6 +20,26 @@ const servers = [
   { id: 'nl', name: 'هلند', city: 'آمستردام', flag: '🇳🇱', ping: 'تنظیم نشده' },
   { id: 'fi', name: 'فنلاند', city: 'هلسینکی', flag: '🇫🇮', ping: 'تنظیم نشده' },
 ];
+
+
+async function saveWireGuardConfig(uri: string): Promise<void> {
+  const config = await FileSystem.readAsStringAsync(uri);
+
+  const checks = [
+    /^\s*\[Interface\]/mi,
+    /^\s*\[Peer\]/mi,
+    /^\s*PrivateKey\s*=\s*.+/mi,
+    /^\s*Address\s*=\s*.+/mi,
+    /^\s*PublicKey\s*=\s*.+/mi,
+    /^\s*Endpoint\s*=\s*.+/mi,
+  ];
+
+  if (!checks.every(pattern => pattern.test(config))) {
+    throw new Error('INVALID_CONFIG');
+  }
+
+  await SecureStore.setItemAsync('morzex_wireguard_config', config);
+}
 
 export default function App() {
   const connected = false;
@@ -128,19 +150,25 @@ export default function App() {
                   copyToCacheDirectory: true,
                 });
 
-                if (!result.canceled && result.assets.length > 0) {
-                  const name = result.assets[0].name;
+                if (result.canceled || result.assets.length === 0) return;
 
-                  if (!name.toLowerCase().endsWith('.conf')) {
-                    Alert.alert('فایل نامعتبر', 'لطفاً یک فایل با پسوند .conf انتخاب کن.');
-                    return;
-                  }
+                const asset = result.assets[0];
 
-                  setConfigName(name);
-                  Alert.alert('فایل انتخاب شد', 'نام فایل: ' + name);
+                if (!asset.name.toLowerCase().endsWith('.conf')) {
+                  Alert.alert('فایل نامعتبر', 'لطفاً فایل .conf انتخاب کن.');
+                  return;
                 }
-              } catch {
-                Alert.alert('خطا', 'انتخاب فایل انجام نشد.');
+
+                await saveWireGuardConfig(asset.uri);
+                setConfigName(asset.name);
+                Alert.alert('موفق', 'کانفیگ بررسی و ذخیره شد.');
+              } catch (error) {
+                const message =
+                  error instanceof Error && error.message === 'INVALID_CONFIG'
+                    ? 'ساختار فایل WireGuard کامل نیست.'
+                    : 'خواندن یا ذخیره کانفیگ انجام نشد.';
+
+                Alert.alert('خطا', message);
               }
             }}
           >

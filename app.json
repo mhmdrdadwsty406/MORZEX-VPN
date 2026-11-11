@@ -38,7 +38,8 @@
           "backgroundColor": "#040507"
         }
       ],
-      "./plugins/withMorzexDesugaring"
+      "./plugins/withMorzexDesugaring",
+      "expo-secure-store"
     ]
   }
 }

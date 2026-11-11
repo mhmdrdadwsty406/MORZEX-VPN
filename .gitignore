@@ -43,3 +43,7 @@ yarn-error.*
 *.keystore
 .env
 .env.*
+
+/private/vless.txt
+
+/private/
