@@ -136,7 +136,7 @@ class MorzexVpnService : VpnService() {
             Notification.Builder(this, CHANNEL_ID)
                 .setContentTitle("MORZEX VPN")
                 .setContentText("VLESS is starting")
-                .setSmallIcon(android.R.drawable.stat_sys_vpn_ic)
+                .setSmallIcon(android.R.drawable.ic_lock_lock)
                 .setOngoing(true)
                 .build()
         } else {
@@ -144,7 +144,7 @@ class MorzexVpnService : VpnService() {
             Notification.Builder(this)
                 .setContentTitle("MORZEX VPN")
                 .setContentText("VLESS is starting")
-                .setSmallIcon(android.R.drawable.stat_sys_vpn_ic)
+                .setSmallIcon(android.R.drawable.ic_lock_lock)
                 .setOngoing(true)
                 .build()
         }

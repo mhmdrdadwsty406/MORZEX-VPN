@@ -6,6 +6,7 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.Promise
 import libXray.LibXray
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class MorzexVlessModule : Module() {
